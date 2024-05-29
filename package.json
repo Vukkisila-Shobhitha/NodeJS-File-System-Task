@@ -1,0 +1,28 @@
+{
+  "name": "nodejs-file-system",
+  "version": "1.0.0",
+  "description": "Node JS file System, create file and retrieve.",
+  "main": "webserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node webserver.js",
+    "dev": "node webserver.js"
+  },
+  "keywords": [],
+  "author": "Shobitha",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vukkisila-Shobhitha/NodeJS-File-System-Task.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vukkisila-Shobhitha/NodeJS-File-System-Task/issues"
+  },
+  "homepage": "https://github.com/Vukkisila-Shobhitha/NodeJS-File-System-Task#readme"
+}
