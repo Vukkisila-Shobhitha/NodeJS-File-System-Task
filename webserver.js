@@ -1,36 +1,75 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const dirName = path.join(dirName,"currentTimeStamps");
-console.log(dirName)
-
+const express = require("express");
 const app = express();
-app.get("/",(req,res) => {
-    res.send("this is my first server")
+const fs = require("fs");
+const path = require("path");
+const PORT = process.env.PORT || 3001;
+
+// API to create a file with current timestamp
+app.get("/", (req, res) => {
+  // Create files directory if not exists
+  if (!fs.existsSync(path.join(__dirname, "files"))) {
+    fs.mkdirSync(path.join(__dirname, "files"));
+  }
+
+  const date = new Date();
+  //   File Name Format: DD-MM-YYYY_HH-MM-SS AM/PM
+  const fileName = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}_${
+    date.getHours() - 12
+  }-${date.getMinutes()}-${date.getSeconds()}${
+    date.getHours() < 12 ? "AM" : "PM"
+  }.txt`;
+
+  //   File Content
+  const filecontent = `Current Time Stamp: ${date}`;
+
+  //   Write File
+  fs.writeFile(path.join(__dirname, "files", fileName), filecontent, (err) => {
+    if (err) {
+      console.log(err);
+      return res.status(404).json({ message: "Error Occured" });
+    } else {
+      console.log(`File ${fileName} Created Successfully`);
+      res.status(200).json({
+        message: "File Created Successfully",
+        fileName: fileName,
+      });
+    }
+  });
 });
 
-app.get("/date-time",(req,res)=>{
-    
-    let date = new Date();
-    let currentTimeStamp= date.toUTCString().slice(0 ,-3)
-    //res.send(currentTimeStamp)
-    let content = `The last updated timestamp : ${currentTimeStamp}`
-    let originalTime = currentTimeStamp;
-    let modifiedTime = originalTime.split(/[ ,:]+/).join("");
-    //or
-    //let modifiedString = originalString.split(" ").join("").split(",").join("").split(":").join("")
-
-console.log(modifiedTime);
-fs.writeFile(`${dirName}/${modifiedTime}.txt`, content, (err)=>{
+// API to read all files in the "files" directory
+app.get("/readfile", (req, res) => {
+  // Read files in the "files" directory
+  fs.readdir(path.join(__dirname, "files"), (err, files = []) => {
+    // Check for errors
     if (err) {
-        console.log(err)
-        res.send("error in writing the file")
-        return
+      console.log(err);
+      return res.status(404).json({ message: "Error Occured" });
     } else {
-        res.sendFile(path.join(dirName,`${modifiedTime }.txt`))
-    }
-})
-})
+      files.forEach((file) => {
+        const itemPath = path.join(__dirname, "files");
+        const stat = fs.statSync(itemPath);
 
-//step-2 listen to a server
-app.listen(3000, ()=>console.log('Server started in https://localhost:3000'))
+        // Check if item is a file or a folder
+        if (!stat.isDirectory()) {
+          console.log(`${file} => Folder`);
+        } else {
+          console.log(`${file} => File`);
+        }
+      });
+    }
+
+    // Check if no files are found
+    if (!files.length) {
+      res.json({ message: "No Files Found" });
+      console.log("No Files Found");
+    } else {
+      res.status(200).json({ files });
+    }
+  });
+});
+
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:3001 port`);
+});
